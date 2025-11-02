@@ -8,17 +8,26 @@ function App() {
     const fetchUsers = async () => {
       try {
         const res = await api.get("/");
-        const filtered = res.data.filter(
-          (user) =>
-            user.listening >= 0 &&
-            user.listening <= 75 &&
-            user.reading >= 0 &&
-            user.reading <= 75 &&
-            user.writing >= 0 &&
-            user.writing <= 75 &&
-            user.speaking >= 0 &&
-            user.speaking <= 75
-        );
+
+        // barcha qiymatlarni raqamga aylantiramiz
+        const filtered = res.data.filter((user) => {
+          const listening = Number(user.listening);
+          const reading = Number(user.reading);
+          const writing = Number(user.writing);
+          const speaking = Number(user.speaking);
+
+          return (
+            listening >= 0 &&
+            listening <= 75 &&
+            reading >= 0 &&
+            reading <= 75 &&
+            writing >= 0 &&
+            writing <= 75 &&
+            speaking >= 0 &&
+            speaking <= 75
+          );
+        });
+
         setUsers(filtered);
       } catch (err) {
         console.error("API bilan ulanishda xatolik:", err);
@@ -27,12 +36,13 @@ function App() {
     fetchUsers();
   }, []);
 
-  // .50 bo‘lsa tepaga chiqarmaydi
+  // .50 bo‘lsa tepaga chiqarmaydi, faqat >0.5 bo‘lsa chiqadi
   const getRoundedScore = (num) => {
     const decimal = num % 1;
     return decimal > 0.5 ? Math.ceil(num) : Math.floor(num);
   };
 
+  // level aniqlash
   const getLevel = (overall) => {
     if (overall >= 65) return { text: "C1", color: "text-green-400" };
     if (overall >= 50.5) return { text: "B2", color: "text-yellow-400" };
@@ -76,12 +86,14 @@ function App() {
             <tbody>
               {users.length > 0 ? (
                 users.map((user, index) => {
+                  const listening = Number(user.listening);
+                  const reading = Number(user.reading);
+                  const writing = Number(user.writing);
+                  const speaking = Number(user.speaking);
+
+                  // aniq o‘rtacha
                   const rawOverall =
-                    (user.listening +
-                      user.reading +
-                      user.writing +
-                      user.speaking) /
-                    4;
+                    (listening + reading + writing + speaking) / 4;
 
                   const rounded = getRoundedScore(rawOverall);
                   const { text: levelText, color: levelColor } =
@@ -98,16 +110,16 @@ function App() {
                         {user.name}
                       </td>
                       <td className="py-2 px-2 sm:py-3 sm:px-4 text-center">
-                        {user.listening}
+                        {listening}
                       </td>
                       <td className="py-2 px-2 sm:py-3 sm:px-4 text-center">
-                        {user.reading}
+                        {reading}
                       </td>
                       <td className="py-2 px-2 sm:py-3 sm:px-4 text-center">
-                        {user.writing}
+                        {writing}
                       </td>
                       <td className="py-2 px-2 sm:py-3 sm:px-4 text-center">
-                        {user.speaking}
+                        {speaking}
                       </td>
                       <td className="py-2 px-2 sm:py-3 sm:px-4 text-center font-semibold text-blue-300">
                         {rounded}
