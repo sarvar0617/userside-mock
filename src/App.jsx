@@ -46,7 +46,8 @@ function App() {
   const getLevel = (overall) => {
     if (overall >= 65) return { text: "C1", color: "text-green-400" };
     if (overall >= 50.5) return { text: "B2", color: "text-yellow-400" };
-    return { text: "B1", color: "text-gray-400" };
+    if (overall >= 38) return { text: "B1", color: "text-blue-400" };
+    return { text: "A2", color: "text-red-400" };
   };
 
   return (
@@ -91,7 +92,6 @@ function App() {
                   const writing = Number(user.writing);
                   const speaking = Number(user.speaking);
 
-                  // aniq o‘rtacha
                   const rawOverall =
                     (listening + reading + writing + speaking) / 4;
 
