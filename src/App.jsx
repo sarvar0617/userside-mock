@@ -136,9 +136,9 @@ function App() {
                 <tr>
                   <td
                     colSpan="7"
-                    className="text-center py-6 text-slate-400 italic"
+                    className="text-center py-6 text-3xl text-slate-400 italic"
                   >
-                    Loading or no valid data...
+                    Loading...
                   </td>
                 </tr>
               )}
