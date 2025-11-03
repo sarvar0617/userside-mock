@@ -3,6 +3,7 @@ import api from "./api/api.js";
 
 function App() {
   const [users, setUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState(""); // 🔍 1. Qidiruv uchun state
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -13,6 +14,7 @@ function App() {
           const reading = Number(user.reading);
           const writing = Number(user.writing);
           const speaking = Number(user.speaking);
+          if ([listening, reading, writing, speaking].some(isNaN)) return false;
           return (
             listening >= 0 &&
             listening <= 75 &&
@@ -32,13 +34,11 @@ function App() {
     fetchUsers();
   }, []);
 
-  // .50 bo‘lsa tepaga chiqarmaydi, faqat >0.5 bo‘lsa chiqadi
   const getRoundedScore = (num) => {
     const decimal = num % 1;
     return decimal > 0.5 ? Math.ceil(num) : Math.floor(num);
   };
 
-  // level aniqlash
   const getLevel = (overall) => {
     if (overall >= 65) return { text: "C1", color: "text-green-400" };
     if (overall >= 50.5) return { text: "B2", color: "text-yellow-400" };
@@ -46,12 +46,28 @@ function App() {
     return { text: "A2", color: "text-red-400" };
   };
 
+  // 🔍 2. Qidiruv bo‘yicha filter
+  const filteredUsers = users.filter((user) =>
+    user.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-900 to-blue-800 text-slate-100 p-4 sm:p-6 md:p-10">
       <div className="max-w-6xl mx-auto bg-white/10 backdrop-blur-2xl rounded-3xl shadow-2xl p-4 sm:p-6 md:p-10 border border-white/10">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-center mb-8 text-blue-400 tracking-wide">
           🎓 Student Results Dashboard
         </h1>
+
+        {/* 🔍 3. Qidiruv input */}
+        <div className="flex justify-center mb-8">
+          <input
+            type="text"
+            placeholder="Search by name..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full sm:w-1/2 md:w-1/3 px-4 py-2 rounded-xl border border-white/20 bg-white/10 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+        </div>
 
         {/* TABLE for desktop */}
         <div className="hidden md:block overflow-x-auto">
@@ -68,8 +84,8 @@ function App() {
               </tr>
             </thead>
             <tbody>
-              {users.length > 0 ? (
-                users.map((user, index) => {
+              {filteredUsers.length > 0 ? (
+                filteredUsers.map((user, index) => {
                   const listening = Number(user.listening);
                   const reading = Number(user.reading);
                   const writing = Number(user.writing);
@@ -82,7 +98,7 @@ function App() {
 
                   return (
                     <tr
-                      key={user.id}
+                      key={user.id || index}
                       className={`transition-all ${
                         index % 2 === 0 ? "bg-white/5" : "bg-white/10"
                       } hover:bg-blue-600/30`}
@@ -109,7 +125,7 @@ function App() {
                     colSpan="7"
                     className="text-center py-6 text-2xl text-slate-400 italic"
                   >
-                    Loading...
+                    No results found
                   </td>
                 </tr>
               )}
@@ -119,8 +135,8 @@ function App() {
 
         {/* CARD VIEW for mobile */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden">
-          {users.length > 0 ? (
-            users.map((user) => {
+          {filteredUsers.length > 0 ? (
+            filteredUsers.map((user) => {
               const listening = Number(user.listening);
               const reading = Number(user.reading);
               const writing = Number(user.writing);
@@ -164,7 +180,7 @@ function App() {
             })
           ) : (
             <p className="text-center text-slate-400 italic text-lg">
-              Loading...
+              No results found
             </p>
           )}
         </div>
